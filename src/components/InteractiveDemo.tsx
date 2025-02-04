@@ -6,10 +6,12 @@ import {
   ClockIcon, 
   CursorArrowRaysIcon,
   ChatBubbleLeftIcon,
-  XMarkIcon
+  XMarkIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 import { supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import Link from 'next/link';
 
 const quizSteps = [
   {
@@ -37,6 +39,7 @@ const InteractiveDemo = () => {
   const [timeOnSite, setTimeOnSite] = useState(0);
   const [mouseMovements, setMouseMovements] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [mouseTrail, setMouseTrail] = useState<{ x: number; y: number }[]>([]);
   const [featureClicks, setFeatureClicks] = useState({
     'Revenue Input': 0,
@@ -80,7 +83,7 @@ const InteractiveDemo = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowFeedback(true);
-    }, 30000);
+    }, 10000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -183,7 +186,12 @@ const InteractiveDemo = () => {
         feedback_rating: rating,
         feedback_text: text
       }).eq('session_id', sessionId);
-      setShowFeedback(false);
+      setFeedbackSubmitted(true);
+      // Keep the feedback modal open but show thank you message
+      setTimeout(() => {
+        setShowFeedback(false);
+        setFeedbackSubmitted(false);
+      }, 50000); // Close after 5 seconds
     } catch (error) {
       console.error('Error saving feedback:', error);
     }
@@ -223,6 +231,17 @@ const InteractiveDemo = () => {
       </svg>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        {/* Added Title Section */}
+        <div className="text-center mb-16 space-y-2">
+          <SparklesIcon className="h-8 w-8 mx-auto text-[#1c1c1c]/70" />
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#1c1c1c]">
+            See It In Action
+          </h2>
+          <p className="text-lg text-[#1c1c1c]/70 max-w-2xl mx-auto">
+            Experience how we track and analyze user behavior to predict churn risk
+          </p>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Left Column - Quiz */}
           <div className="lg:w-2/3">
@@ -335,37 +354,59 @@ const InteractiveDemo = () => {
         {/* Feedback Modal */}
         {showFeedback && (
           <div className="fixed bottom-8 right-8 max-w-sm bg-white rounded-2xl border border-gray-200 shadow-lg p-6 animate-slide-up">
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-2">
-                <ChatBubbleLeftIcon className="h-5 w-5 text-blue-600" />
-                <h3 className="font-semibold text-gray-900">Quick Feedback</h3>
+            {!feedbackSubmitted ? (
+              <>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-2">
+                    <ChatBubbleLeftIcon className="h-5 w-5 text-blue-600" />
+                    <h3 className="font-semibold text-gray-900">Quick Feedback</h3>
+                  </div>
+                  <button 
+                    onClick={() => setShowFeedback(false)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </button>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  How likely are you to recommend this calculator to a colleague?
+                </p>
+                <div className="flex gap-2 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <button
+                      key={i}
+                      className="w-10 h-10 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all text-gray-700 hover:text-blue-600"
+                      onClick={() => handleFeedback(i + 1, '')}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="space-y-4 animate-fade-in">
+                <div className="flex items-center gap-2 mb-4">
+                  <SparklesIcon className="h-5 w-5 text-blue-600" />
+                  <h3 className="font-semibold text-gray-900">Thank You!</h3>
+                </div>
+                <div className="bg-blue-50 rounded-xl p-4">
+                  <p className="text-sm text-gray-700 mb-2">
+                    🎉 Special Offer Unlocked!
+                  </p>
+                  <p className="text-sm font-medium text-gray-900">
+                    Sign up within 7 days to get 20% off your first month!
+                  </p>
+                </div>
+                <div className="flex justify-end">
+                  <Link 
+                    href="/sign-up" 
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    Create account →
+                  </Link>
+                </div>
               </div>
-              <button 
-                onClick={() => setShowFeedback(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <XMarkIcon className="h-5 w-5" />
-              </button>
-            </div>
-            <p className="text-gray-600 mb-4">
-              How likely are you to recommend this calculator to a colleague?
-            </p>
-            <div className="flex gap-2 mb-4">
-              {[...Array(5)].map((_, i) => (
-                <button
-                  key={i}
-                  className="w-10 h-10 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all text-gray-700 hover:text-blue-600"
-                  onClick={() => handleFeedback(i + 1, '')}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-            <textarea
-              placeholder="Any additional feedback? (optional)"
-              className="w-full p-3 rounded-lg border border-gray-200 text-sm"
-              rows={3}
-            />
+            )}
           </div>
         )}
       </div>

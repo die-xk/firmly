@@ -3,7 +3,6 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Lato } from 'next/font/google'
 import ExitIntentPopup from '@/components/ExitIntentPopup'
-import TimeBasedNotification from '@/components/TimeBasedNotification'
 import CookieBanner from '@/components/CookieBanner'
 
 const lato = Lato({ 
@@ -28,7 +27,6 @@ export default function RootLayout({
         <body className={`${lato.variable} font-sans`}>
           {children}
           <ExitIntentPopup />
-          <TimeBasedNotification />
           <CookieBanner />
         </body>
       </html>
