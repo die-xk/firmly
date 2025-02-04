@@ -18,6 +18,7 @@ const eslintConfig = [
       "@next/next/no-page-custom-font": "off",
       "react-hooks/exhaustive-deps": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "react/jsx-no-comment-textnodes": "off",
       // Add any other rules you want to disable
     },
   },
