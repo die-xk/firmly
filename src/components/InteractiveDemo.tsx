@@ -44,8 +44,9 @@ const InteractiveDemo = () => {
     'Customer Input': 0,
   });
   const componentRef = useRef<HTMLDivElement>(null);
-  const trailTimeout = useRef<NodeJS.Timeout>();
+  const trailTimeout = useRef<NodeJS.Timeout | null>(null);
   const [sessionId] = useState(() => uuidv4());
+
 
   // Track scroll percentage
   useEffect(() => {
